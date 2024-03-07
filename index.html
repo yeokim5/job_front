@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JSON Data Display</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        background-color: #f4f4f4;
+      }
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .card {
+        background-color: #fff;
+        border-radius: 5px;
+        margin-bottom: 20px;
+        padding: 15px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      .card a {
+        color: #007bff;
+        text-decoration: none;
+      }
+      .card a:hover {
+        text-decoration: underline;
+      }
+      .card h2 {
+        margin-top: 0;
+      }
+      .card p {
+        margin: 10px 0;
+      }
+      .card .date {
+        font-style: italic;
+        color: #666;
+      }
+      .place-heading {
+        font-size: 24px;
+        font-weight: bold;
+        margin-bottom: 10px;
+      }
+
+      .date-in-range {
+        background-color: gold;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>로딩 좀 오래걸림...</h1>
+    <div class="container">
+      <!-- JSON data will be displayed here dynamically -->
+    </div>
+
+    <script>
+      console.log(`fetch start`);
+
+      document.addEventListener("DOMContentLoaded", function () {
+        // Fetch JSON data from the server
+        fetch("http://localhost:4000/")
+          .then((response) => response.json())
+          .then((jsonData) => {
+            // Process the fetched JSON data
+            var container = document.querySelector(".container");
+
+            jsonData.forEach(function (item, index) {
+              // Check if the place is the same as the previous item
+              if (index === 0 || item.place !== jsonData[index - 1].place) {
+                // Create a heading for the place
+                var placeHeading = document.createElement("h1");
+                placeHeading.classList.add("place-heading");
+                placeHeading.textContent = item.place.toUpperCase();
+                container.appendChild(placeHeading);
+              }
+
+              // Create card for each JSON data entry
+              var card = document.createElement("div");
+              card.classList.add("card");
+              var title = document.createElement("h2");
+              var link = document.createElement("a");
+              link.href = item.link;
+              link.textContent = item.title;
+              var date = document.createElement("p");
+              date.classList.add("date");
+              date.textContent = item.date;
+
+              // Check if the date is within the range of -7 to 0
+              var daysAgo = parseInt(item.date.match(/-?\d+/)[0]);
+              if (daysAgo >= -1 && daysAgo <= 0) {
+                card.classList.add("date-in-range");
+              }
+
+              title.appendChild(link);
+              card.appendChild(title);
+              card.appendChild(date);
+              container.appendChild(card);
+            });
+          })
+          .catch((error) => {
+            console.error("Error fetching JSON data:", error);
+          });
+      });
+    </script>
+  </body>
+</html>
